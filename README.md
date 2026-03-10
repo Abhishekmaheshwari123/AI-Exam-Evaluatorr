@@ -154,7 +154,9 @@ Step 5 — Add AI Processing Layer
 
 Now we introduce OCR and AI grading.
 
-Teacher Uploads Answer Sheets
+    +-----------------------------+
+    |Teacher Uploads Answer Sheets|
+    +-----------------------------+
            |
            v
     +-------------+
@@ -267,6 +269,7 @@ Architecture becomes:
 
 
 Step 9 — Final High Level Architecture
+
                                 +----------------------+
                                 |      Frontend        |
                                 |        React         |
