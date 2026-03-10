@@ -1,7 +1,6 @@
-🎓 AI Exam Evaluator
-An AI-Powered Automatic Exam Evaluation System
-
-A scalable platform that evaluates answer sheets automatically using OCR + AI grading + distributed processing.
+AI-Exam-Evalutor
+=======
+# AI-Exam-Evaluator
 
 🚀 Step 0 — What We Are Building
 
@@ -59,76 +58,78 @@ Requirement	Description
 
 Every system revolves around data entities.
 
-Main Entities
-Teacher
-Student
-Exam
-AnswerKey
-Submission
-Result
-AnswerSheet
+Main Entitiesin our system:
 
-These entities will later become database tables.
+    Teacher
+    Student
+    Exam
+    AnswerKey
+    Submission
+    Result
+    AnswerSheet
+
 
 🔄 Step 3 — System Workflow
 
 Let’s understand the end-to-end flow of the system.
 
-                Teacher Creates Exam
-                        |
-                        v
-                Uploads Answer Key
-                        |
-                        v
-                Uploads Answer Sheets
-                        |
-                        v
-                Files Stored in Storage
-                        |
-                        v
-                OCR Extracts Text
-                        |
-                        v
-                AI Evaluates Answers
-                        |
-                        v
-                Marks + Feedback Generated
-                        |
-                        v
-                Results Stored in Database
-                        |
-                        v
-                Teacher / Student Dashboard
+                    Teacher Creates Exam
+                            |
+                            v
+                    Teacher Uploads Answer Key
+                            |
+                            v
+                    Teacher Uploads Answer Sheets
+                            |
+                            v
+                    System Stores Files
+                            |
+                            v
+                    OCR Extracts Text
+                            |
+                            v
+                    AI Evaluates Answers
+                            |
+                            v
+                    Marks + Feedback Generated
+                            |
+                            v
+                    Results Stored in Database
+                            |
+                            v
+                    Teacher / Student Dashboard
 
-This pipeline represents the core evaluation engine.
+This is the core pipeline of the system.
+
 
 🏗 Step 4 — First Architecture (Simple Version)
 
 We always start with a simple architecture.
 
-+----------------------+
-|   Teacher / Student  |
-+----------+-----------+
-           |
-           v
-+----------------------+
-|       Frontend       |
-|        React         |
-+----------+-----------+
-           |
-           v
-+----------------------+
-|      Backend API     |
-|       Node.js        |
-+----------+-----------+
-           |
-    +------+------+
-    |             |
-    v             v
-+-----------+   +----------------+
-| Database  |   |  File Storage  |
-|PostgreSQL |   |  PDFs / Images |
-+-----------+   +----------------+
+
+        +----------------------+
+        |   Teacher / Student  |
+        +----------+-----------+
+                   |
+                   v
+        +----------------------+
+        |       Frontend       |
+        |       (React)        |
+        +----------+-----------+
+                   |
+                   v
+        +----------------------+
+        |      Backend API     |
+        |   (Node.js Server)   |
+        +----------+-----------+
+                   |
+        +----------+-----------+
+        |                      |
+        v                      v
++---------------+     +----------------+
+|   Database    |     |  File Storage  |
+| PostgreSQL    |     | PDF / Images   |
++---------------+     +----------------+
 
 At this stage the system only:
 
@@ -141,41 +142,39 @@ No AI yet.
 
 Now we introduce OCR + AI grading.
 
-Teacher Uploads Answer Sheets
-        |
-        v
-+-------------+
-|   Backend   |
-+------+------+ 
-       |
-       v
-+-------------+
-| File Storage|
-+------+------+ 
-       |
-       v
-+-------------+
-| OCR Service |
-| Extract Text|
-+------+------+ 
-       |
-       v
-+-------------+
-| AI Grading  |
-| NLP Model   |
-+------+------+ 
-       |
-       v
-+-------------+
-|  Results DB |
-+-------------+
-OCR Technology
+    +-----------------------------+
+    |Teacher Uploads Answer Sheets|
+    +-----------------------------+
+           |
+           v
+    +-------------+
+    |   Backend   |
+    +------+------+ 
+           |
+           v
+    +-------------+
+    | File Storage|
+    +------+------+
+           |
+           v
+    +-------------+
+    | OCR Service |
+    | Text Extract|
+    +------+------+
+           |
+           v
+    +-------------+
+    | AI Grading  |
+    | NLP Model   |
+    +------+------+
+           |
+           v
+    +-------------+
+    |   Results   |
+    |  Database   |
+    +-------------+
 
-We use:
-
-Tesseract OCR
-
-for extracting text from scanned answer sheets.
+OCR will be done using Tesseract OCR.
 
 ⚠️ Step 6 — Problem With This Architecture
 
@@ -187,69 +186,79 @@ If backend processes them directly:
 ❌ Requests block
 ❌ System crashes
 
+    Solution → Asynchronous Processing
+
+
+
 🧠 Step 7 — Introducing Queue System
 
 Solution → Asynchronous Processing
 
 We introduce a message queue like Apache Kafka.
 
-Teacher Upload
-      |
-      v
-+-------------+
-|   Backend   |
-+------+------+ 
-      |
-      v
-+-------------+
-|  Job Queue  |
-|    Kafka    |
-+------+------+ 
-      |
-      v
-+-------------+
-| OCR Workers |
-+------+------+ 
-      |
-      v
-+-------------+
-| AI Workers  |
-+------+------+ 
-      |
-      v
-+-------------+
-|  Database   |
-+-------------+
-Why Queue?
 
-Workers can process answer sheets in parallel, making the system scalable.
+New architecture:
+
+        Teacher Upload
+            |
+            v
+        +-------------+
+        |   Backend   |
+        +------+------+
+            |
+            v
+        +-------------+
+        |  Job Queue  |
+        |   (Kafka)   |
+        +------+------+
+            |
+            v
+        +-------------+
+        | OCR Workers |
+        +------+------+
+            |
+            v
+        +-------------+
+        | AI Workers  |
+        +------+------+
+            |
+            v
+        +-------------+
+        |  Database   |
+        +-------------+
+
+Workers process answer sheets in parallel.
+
+
 
 ⚡ Step 8 — Adding Cache Layer
 
 Some queries happen very frequently:
 
-exam list
+    exam list
 
-results
+    results
 
-analytics
+    analytics
 
-dashboard data
+    dashboard data
 
 To reduce database load we add Redis Cache.
 
-Client
-  |
-  v
-Frontend
-  |
-  v
-Backend API
-  |
-  +-------> Redis Cache
-  |
-  v
-Database
+Architecture becomes:
+
+        Client
+        |
+        v
+        Frontend
+        |
+        v
+        Backend API
+        |
+        +-------> Redis Cache
+        |
+        v
+        Database
 
 Benefits:
 
@@ -257,43 +266,46 @@ Benefits:
 ✔ Reduced database load
 ✔ Better scalability
 
+
+
 🧠 Step 9 — Final High Level Architecture
-                            +----------------------+
-                            |      Frontend        |
-                            |        React         |
-                            +----------+-----------+
+
+                                +----------------------+
+                                |      Frontend        |
+                                |        React         |
+                                +----------+-----------+
+                                        |
+                                        v
+                                +----------------------+
+                                |      Backend API     |
+                                |      Node.js         |
+                                +----+-----------+-----+
+                                    |           |
+                                    v           v
+                            +---------+   +--------+
+                            |  Redis  |   |Database|
+                            |  Cache  |   |Postgres|
+                            +----+----+   +----+---+
                                     |
                                     v
-                            +----------------------+
-                            |      Backend API     |
-                            |       Node.js        |
-                            +----+-----------+-----+
-                                |           |
-                                v           v
-                        +---------+   +--------+
-                        |  Redis  |   |Database|
-                        |  Cache  |   |Postgres|
-                        +----+----+   +----+---+
+                            +----------+
+                            | Job Queue|
+                            |  Kafka   |
+                            +----+-----+
+                                    |
+                    +-------------+-------------+
+                    |                           |
+                    v                           v
+                +-----------+               +-----------+
+                | OCR Worker|               | AI Worker |
+                +-----------+               +-----------+
+                    |                           |
+                    +------------+--------------+
                                 |
                                 v
-                        +----------+
-                        | Job Queue|
-                        |  Kafka   |
-                        +----+-----+
-                                |
-                +-------------+-------------+
-                |                           |
-                v                           v
-            +-----------+               +-----------+
-            | OCR Worker|               | AI Worker |
-            +-----------+               +-----------+
-                |                           |
-                +------------+--------------+
-                            |
-                            v
-                        +-----------+
-                        |  Results  |
-                        +-----------+
+                            +-----------+
+                            |  Results  |
+                            +-----------+
 
 This architecture supports:
 
@@ -305,50 +317,40 @@ This architecture supports:
 
 We will build the system step-by-step.
 
-Phase	Task
-Phase 1	Project structure
-Phase 2	Database design
-Phase 3	Backend APIs
-Phase 4	Frontend upload system
-Phase 5	OCR pipeline
-Phase 6	AI grading engine
-Phase 7	Queue workers
-Phase 8	Caching
-Phase 9	Scaling architecture
+Phase	        Task
+Phase 1	        Project structure
+Phase 2	        Database design
+Phase 3	        Backend APIs
+Phase 4	        Frontend upload system
+Phase 5	        OCR pipeline
+Phase 6	        AI grading engine
+Phase 7	        Queue workers
+Phase 8	        Caching
+Phase 9	        Scaling architecture
+
+
 💡 Tech Stack
 
 Frontend
-
 React
-
 TailwindCSS
 
 Backend
-
 Node.js
-
 Express
 
 AI
-
 Python
-
 NLP models
-
 Sentence Transformers
-
 OCR
-
 Tesseract OCR
 
 Database
-
 PostgreSQL
 
 Queue
-
 Apache Kafka
 
 Cache
-
 Redis
