@@ -126,10 +126,10 @@ We always start with a simple architecture.
         +----------+-----------+
         |                      |
         v                      v
-+---------------+     +----------------+
-|   Database    |     |  File Storage  |
-| PostgreSQL    |     | PDF / Images   |
-+---------------+     +----------------+
+    +---------------+     +----------------+
+    |   Database    |     |  File Storage  |
+    | PostgreSQL    |     | PDF / Images   |
+    +---------------+     +----------------+
 
 At this stage the system only:
 
