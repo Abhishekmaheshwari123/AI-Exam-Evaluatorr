@@ -317,40 +317,50 @@ This architecture supports:
 
 We will build the system step-by-step.
 
-Phase	        Task
-Phase 1	        Project structure
-Phase 2	        Database design
-Phase 3	        Backend APIs
-Phase 4	        Frontend upload system
-Phase 5	        OCR pipeline
-Phase 6	        AI grading engine
-Phase 7	        Queue workers
-Phase 8	        Caching
-Phase 9	        Scaling architecture
-
-
+Phase	Task
+Phase 1	Project structure
+Phase 2	Database design
+Phase 3	Backend APIs
+Phase 4	Frontend upload system
+Phase 5	OCR pipeline
+Phase 6	AI grading engine
+Phase 7	Queue workers
+Phase 8	Caching
+Phase 9	Scaling architecture
 💡 Tech Stack
 
 Frontend
+
 React
+
 TailwindCSS
 
 Backend
+
 Node.js
+
 Express
 
 AI
+
 Python
+
 NLP models
+
 Sentence Transformers
+
 OCR
+
 Tesseract OCR
 
 Database
+
 PostgreSQL
 
 Queue
+
 Apache Kafka
 
 Cache
+
 Redis
